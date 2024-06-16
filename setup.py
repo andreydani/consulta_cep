@@ -2,7 +2,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="cep-consulta",
+    name="consulta_cep",
     version="0.1.0",
     packages=find_packages(),
     install_requires=[
@@ -13,12 +13,12 @@ setup(
             'consulta-cep=cep_consulta.main:main',
         ],
     },
-    author="Seu Nome",
-    author_email="seuemail@example.com",
+    author="Andrey Sant'Anna",
+    author_email="andreysantanna@gmail.com",
     description="Biblioteca para consulta de endereços a partir de CEP usando serviços variados.",
     long_description=open('README.md').read(),
     long_description_content_type="text/markdown",
-    url="https://github.com/seuusuario/cep-consulta",
+    url="https://github.com/andreydani/consulta_cep",
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",

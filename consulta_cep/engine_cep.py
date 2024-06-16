@@ -1,7 +1,7 @@
 import json
 import dataclasses
 
-from util import validar_cep, sanitizar_cep
+from .util import validar_cep, sanitizar_cep
 
 
 @dataclasses.dataclass

@@ -1,5 +1,5 @@
-from engine_cep import ConsultaCEP, Endereco
-from util import consulta_cep_https
+from .engine_cep import ConsultaCEP, Endereco
+from .util import consulta_cep_https
 
 
 class ConsultaCEPBrasilAPI(ConsultaCEP):
