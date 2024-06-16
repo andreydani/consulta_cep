@@ -38,8 +38,12 @@ def upload(c):
 
 @task
 def test(c):
+    if os.name == 'nt':
+        pytest = 'env\\Scripts\\pytest'
+    else:
+        pytest = 'env/bin/pytest'
     """Executa os testes"""
-    c.run("pytest tests")
+    c.run(f"{pytest} tests")
     print("Testes executados.")
 
 

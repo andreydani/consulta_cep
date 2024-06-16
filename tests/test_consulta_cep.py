@@ -1,5 +1,4 @@
 import unittest
-
 from consulta_cep.engine_cep import Endereco
 from consulta_cep.servicos import ConsultaCEPPostmon, ConsultaCEPBrasilAPI
 
@@ -20,7 +19,6 @@ class TestConsultaCEP(unittest.TestCase):
         self.assertEqual(resultado.cidade, "São Paulo")
         self.assertEqual(resultado.bairro, "Sé")
         self.assertEqual(resultado.logradouro, "Praça da Sé")
-
 
 
 if __name__ == "__main__":
