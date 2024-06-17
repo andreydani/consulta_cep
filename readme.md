@@ -1,6 +1,7 @@
 # Consulta CEP
 
 Biblioteca para consulta de endereços a partir de CEP usando serviços variados.
+Veja no PyPI: https://pypi.org/project/consulta-cep/
 
 ## Instalação
 
@@ -8,6 +9,15 @@ Você pode instalar a biblioteca via pip:
 
 ```bash
 pip install consulta-cep
+```
+
+## Uso em programas
+
+```bash
+from consulta_cep import consulta_concorrente
+endereco = consulta_concorrente('05010-000')
+print(endereco)
+Endereco(servico='BrasilAPI', estado='SP', cidade='São Paulo', bairro='Perdizes', logradouro='Rua Caiubi')
 ```
 
 ## Uso utilitário

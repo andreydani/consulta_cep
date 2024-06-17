@@ -5,9 +5,10 @@ import venv
 
 
 if os.name == 'nt':
-    python = 'env\\Scripts\\python'
+    path = 'env\\Scripts'
 else:
-    python = 'env/bin/python'
+    path = 'env/bin'
+path = os.path.join(os.path.split(__file__)[0], path)
 
 
 @task
@@ -25,25 +26,22 @@ def clean(c):
 @task
 def build(c):
     """Constrói os pacotes da biblioteca"""
-    c.run(f"{python} setup.py build")
+    print(f"{path}/python setup.py sdist bdist_wheel")
+    c.run(f"{path}/python setup.py sdist bdist_wheel")
     print("Pacotes construídos.")
 
 
 @task
 def upload(c):
     """Faz upload dos pacotes para o PyPI"""
-    c.run("twine upload dist/*")
+    c.run(f"twine upload dist/* --repository-url https://upload.pypi.org/legacy/")
     print("Pacotes enviados para o PyPI.")
 
 
 @task
 def test(c):
-    if os.name == 'nt':
-        pytest = 'env\\Scripts\\pytest'
-    else:
-        pytest = 'env/bin/pytest'
     """Executa os testes"""
-    c.run(f"{pytest} tests")
+    c.run(f"{path}/pytest tests")
     print("Testes executados.")
 
 
@@ -62,11 +60,7 @@ def create_virtualenv(c):
     if os.path.exists('env'):
         shutil.rmtree('env')
     venv.create('env', with_pip=True)
-    if os.name == 'nt':
-        pip = 'env\\Scripts\\pip'
-    else:
-        pip = 'env/bin/pip'
-    c.run(f"{pip} install -r requirements_dev.txt")
+    c.run(f"{path}/pip install -r requirements_dev.txt")
     print("Ambiente virtual criado e dependências instaladas.")
 
 
