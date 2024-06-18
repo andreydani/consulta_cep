@@ -10,7 +10,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'consulta-cep=cep_consulta.main:main',
+            'consulta-cep=consulta_cep.main:main',
         ],
     },
     author="Andrey Sant'Anna",

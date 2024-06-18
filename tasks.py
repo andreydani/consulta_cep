@@ -18,8 +18,8 @@ def clean(c):
         shutil.rmtree('build')
     if os.path.exists('dist'):
         shutil.rmtree('dist')
-    if os.path.exists('cep_consulta.egg-info'):
-        shutil.rmtree('cep_consulta.egg-info')
+    if os.path.exists('consulta_cep.egg-info'):
+        shutil.rmtree('consulta_cep.egg-info')
     print("Arquivos de build removidos.")
 
 

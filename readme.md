@@ -14,8 +14,8 @@ pip install consulta-cep
 ## Uso em programas
 
 ```bash
-from consulta_cep import consulta_concorrente
-endereco = consulta_concorrente('05010-000')
+from consulta_cep import consulta_cep
+endereco = consulta_cep('05010-000')
 print(endereco)
 Endereco(servico='BrasilAPI', estado='SP', cidade='São Paulo', bairro='Perdizes', logradouro='Rua Caiubi')
 ```
