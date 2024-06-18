@@ -1,21 +1,29 @@
-from . import consulta_concorrente
+from . import consulta_cep
 import argparse
 
+
 def main():
-    parser = argparse.ArgumentParser(description="Consultar endereço a partir do CEP.")
-    parser.add_argument("cep", type=str, help="CEP para consulta (formato: 12345-678 ou 12345678)")
+    parser = argparse.ArgumentParser(
+        description="Consultar endereço a partir do CEP."
+    )
+    parser.add_argument(
+        "cep",
+        type=str,
+        help="CEP para consulta (formato: 12345-678 ou 12345678)"
+    )
     args = parser.parse_args()
 
     cep = args.cep
 
     try:
-        endereco = consulta_concorrente(cep)
+        endereco = consulta_cep(cep)
         if endereco:
             print(endereco)
         else:
             print(
                 dict(
-                    erro="Nenhum serviço conseguiu retornar um endereço válido."
+                    erro="Nenhum serviço conseguiu retornar"
+                         " um endereço válido."
                 )
             )
     except Exception as e:
@@ -25,5 +33,5 @@ def main():
             )
         )
 
-if __name__ == "__main__":
-    main()
+
+main()

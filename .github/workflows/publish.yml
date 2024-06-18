@@ -1,5 +1,5 @@
 
-name: Upload Python Package
+name: Publish to PyPI
 
 on:
   release:
@@ -35,12 +35,13 @@ jobs:
       run: |
         python setup.py sdist bdist_wheel
 
+    - name: Lint code
+      run: |
+        flake8 cep_consulta
+
     - name: Publish package
       uses: pypa/gh-action-pypi-publish@27b31702a0e7fc50959f5ad993c78deac1bdfc29
       with:
         user: __token__
         password: ${{ secrets.PYPI_API_TOKEN }}
 
-    - name: Lint code
-      run: |
-        flake8 cep_consulta tests

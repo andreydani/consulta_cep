@@ -4,6 +4,7 @@ from .util import consulta_cep_https
 
 class ConsultaCEPBrasilAPI(ConsultaCEP):
     URL = "https://brasilapi.com.br/api/cep/v1/{cep}"
+
     def consultar(self, cep):
         cep = self._validar_cep(cep)
         res = consulta_cep_https(self.URL, cep)
@@ -18,6 +19,7 @@ class ConsultaCEPBrasilAPI(ConsultaCEP):
 
 class ConsultaCEPPostmon(ConsultaCEP):
     URL = "http://api.postmon.com.br/v1/cep/{cep}"
+
     def consultar(self, cep):
         cep = self._validar_cep(cep)
         res = consulta_cep_https(self.URL, cep)
