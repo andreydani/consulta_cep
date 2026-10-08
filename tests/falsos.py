@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import asyncio
 import threading
+import time
+from collections.abc import Iterable
 from typing import Any
 
 import httpx
@@ -66,3 +68,16 @@ class Falso(ConsultaCEP):
                 raise
         await asyncio.sleep(0)
         return self._resultado(cep)
+
+
+def esperar_chamadas(falsos: Iterable[Falso], prazo: float = 2.0) -> None:
+    """Espera cada serviço falso registrar ao menos uma chamada.
+
+    No modo concorrente síncrono, ``consulta_cep()`` devolve o primeiro sucesso
+    sem esperar as outras threads; uma delas pode já ter começado sem ainda ter
+    registrado a chamada.
+    """
+    falsos = list(falsos)
+    limite = time.monotonic() + prazo
+    while not all(f.chamadas for f in falsos) and time.monotonic() < limite:
+        time.sleep(0.001)
