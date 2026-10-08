@@ -26,7 +26,7 @@ from consulta_cep import (
 from consulta_cep import servicos as modulo_servicos
 
 from .dados import CEP, resposta, simular, url
-from .falsos import Falso
+from .falsos import Falso, esperar_chamadas
 
 Consulta = Callable[..., Endereco]
 
@@ -144,6 +144,7 @@ def test_parametros_sao_keyword_only() -> None:
 def test_timeout_e_repassado(consultar: Consulta, estrategia: str) -> None:
     falsos = [Falso("a", erro=RuntimeError()), Falso("b")]
     consultar(CEP, timeout=2.5, servicos=falsos, estrategia=estrategia)
+    esperar_chamadas(falsos)
     for falso in falsos:
         assert falso.chamadas == [(CEP, 2.5)]
 
@@ -230,6 +231,7 @@ def test_sequencial_todos_falhando(consultar: Consulta) -> None:
 def test_concorrente_consulta_todos(consultar: Consulta) -> None:
     falsos = [Falso("a", erro=OSError()), Falso("b", erro=OSError()), Falso("c")]
     assert consultar(CEP, servicos=falsos).servico == "c"
+    esperar_chamadas(falsos)
     assert all(len(f.chamadas) == 1 for f in falsos)
 
 
