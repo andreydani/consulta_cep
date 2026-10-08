@@ -1,37 +1,49 @@
-from . import consulta_cep
+from __future__ import annotations
+
 import argparse
+import json
+import sys
+from collections.abc import Sequence
+
+from . import TIMEOUT_PADRAO, __version__, consulta_cep
+from .excecoes import CEPInvalidoError, ConsultaCEPError
 
 
-def main():
+def _erro(mensagem: str) -> None:
+    print(json.dumps({"erro": mensagem}, ensure_ascii=False), file=sys.stderr)
+
+
+def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
-        description="Consultar endereço a partir do CEP."
+        prog="consulta-cep",
+        description="Consultar endereço a partir do CEP.",
     )
     parser.add_argument(
         "cep",
-        type=str,
-        help="CEP para consulta (formato: 12345-678 ou 12345678)"
+        help="CEP para consulta (formato: 12345-678 ou 12345678)",
     )
-    args = parser.parse_args()
-
-    cep = args.cep
+    parser.add_argument(
+        "--timeout",
+        type=float,
+        default=TIMEOUT_PADRAO,
+        help="tempo máximo de cada requisição, em segundos (padrão: %(default)s)",
+    )
+    parser.add_argument(
+        "--version", action="version", version=f"%(prog)s {__version__}"
+    )
+    args = parser.parse_args(argv)
 
     try:
-        endereco = consulta_cep(cep)
-        if endereco:
-            print(endereco)
-        else:
-            print(
-                dict(
-                    erro="Nenhum serviço conseguiu retornar"
-                         " um endereço válido."
-                )
-            )
-    except Exception as e:
-        print(
-            dict(
-                erro="Erro ao realizar consulta: " + str(e)
-            )
-        )
+        endereco = consulta_cep(args.cep, timeout=args.timeout)
+    except CEPInvalidoError as erro:
+        _erro(str(erro))
+        return 2
+    except ConsultaCEPError as erro:
+        _erro(str(erro))
+        return 1
+    print(endereco)
+    return 0
 
 
-main()
+if __name__ == "__main__":
+    sys.exit(main())

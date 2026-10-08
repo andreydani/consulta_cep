@@ -1,7 +1,11 @@
-import json
-import dataclasses
+from __future__ import annotations
 
-from .util import validar_cep, sanitizar_cep
+import dataclasses
+import json
+from abc import ABC, abstractmethod
+from typing import Any
+
+from .util import TIMEOUT_PADRAO, normalizar_cep
 
 
 @dataclasses.dataclass
@@ -12,15 +16,30 @@ class Endereco:
     bairro: str
     logradouro: str
 
-    def __str__(self):
-        return json.dumps(dataclasses.asdict(self))
+    def __str__(self) -> str:
+        return json.dumps(dataclasses.asdict(self), ensure_ascii=False)
 
 
-class ConsultaCEP(object):
-    def consultar(self, cep: str) -> Endereco:
-        """Método a ser implementado pelas subclasses"""
-        pass
+class ConsultaCEP(ABC):
+    """Base dos serviços de consulta de CEP."""
 
-    def _validar_cep(self, cep: str) -> str:
-        validar_cep(cep)
-        return sanitizar_cep(cep)
+    nome: str = ""
+
+    def consultar(self, cep: str, *, timeout: float = TIMEOUT_PADRAO) -> Endereco:
+        """Valida, normaliza e consulta o CEP neste serviço."""
+        return self.consultar_normalizado(normalizar_cep(cep), timeout=timeout)
+
+    @abstractmethod
+    def consultar_normalizado(
+        self, cep: str, *, timeout: float = TIMEOUT_PADRAO
+    ) -> Endereco:
+        """Consulta um CEP já normalizado (8 dígitos)."""
+
+    def __repr__(self) -> str:
+        return f"{type(self).__name__}()"
+
+
+def texto(dados: dict[str, Any], chave: str) -> str:
+    """Lê um campo opcional da resposta, trocando ausência/null por ''."""
+    valor = dados.get(chave)
+    return "" if valor is None else str(valor)

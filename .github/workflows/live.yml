@@ -1,0 +1,27 @@
+# Roda os testes contra as APIs reais de CEP para detectar quando alguma
+# delas mudar o formato da resposta ou sair do ar.
+name: APIs reais
+
+on:
+  schedule:
+    - cron: "17 9 * * 1" # segunda-feira, 09:17 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  live:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]"
+      - name: Pytest (live)
+        run: pytest -m live -v

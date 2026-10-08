@@ -1,0 +1,72 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "consulta_cep"
+dynamic = ["version"]
+description = "Biblioteca para consulta de endereços a partir de CEP usando serviços variados."
+readme = "readme.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.10"
+authors = [{ name = "Andrey Sant'Anna", email = "andreysantanna@gmail.com" }]
+dependencies = ["requests"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Operating System :: OS Independent",
+    "Natural Language :: Portuguese (Brazilian)",
+    "Typing :: Typed",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-cov",
+    "ruff",
+    "mypy",
+    "types-requests",
+    "responses",
+]
+
+[project.scripts]
+consulta-cep = "consulta_cep.__main__:main"
+
+[project.urls]
+Homepage = "https://github.com/andreydani/consulta_cep"
+Issues = "https://github.com/andreydani/consulta_cep/issues"
+
+[tool.hatch.version]
+path = "consulta_cep/__init__.py"
+
+[tool.hatch.build.targets.sdist]
+include = ["consulta_cep", "tests", "readme.md", "LICENSE"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = ["-m", "not live", "--strict-markers"]
+markers = [
+    "live: chama as APIs reais de CEP (desligado por padrão; rode com `pytest -m live`)",
+]
+
+[tool.coverage.run]
+source = ["consulta_cep"]
+branch = true
+
+[tool.ruff]
+target-version = "py310"
+line-length = 88
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "UP", "B", "SIM", "RUF"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+files = ["consulta_cep", "tests"]
