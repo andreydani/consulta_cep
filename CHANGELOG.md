@@ -24,15 +24,16 @@ APIs de CEP, versão assíncrona, cache e uma linha de comando completa. Veja
 - Os erros não são mais impressos com `print()`; vão para o logger
   `consulta_cep`.
 - `Endereco.servico` agora é o nome curto do serviço (`"brasilapi"`,
-  `"postmon"`), em vez de `"BrasilAPI"`/`"PostMon"`.
+  `"viacep"`), em vez de `"BrasilAPI"`/`"PostMon"`.
 - `Endereco.bairro` e `Endereco.logradouro` podem ser `None` quando o serviço
   não os informa.
 - `Endereco.estado` é sempre a sigla da UF; criar um `Endereco` com uma UF
   inexistente lança `ValueError`.
 - `str(Endereco)` mantém os acentos (`ensure_ascii=False`) e inclui os campos
   novos.
-- Lista padrão de serviços: BrasilAPI (v2), ViaCEP, OpenCEP e AwesomeAPI. O
-  Postmon saiu da lista padrão.
+- Lista padrão de serviços: BrasilAPI (v2), ViaCEP, OpenCEP e AwesomeAPI.
+- O Postmon foi removido: a API foi desativada (o domínio
+  `api.postmon.com.br` não resolve mais).
 - Subclasses de `ConsultaCEP` implementam `converter(dados, cep)` e definem
   `nome` e `URL`; a classe base faz as requisições (sync e async).
 - Linha de comando: saída em texto por padrão (`--formato json` para JSON),
@@ -72,7 +73,6 @@ APIs de CEP, versão assíncrona, cache e uma linha de comando completa. Veja
 
 ### Alterado
 
-- Postmon passou a usar HTTPS.
 - BrasilAPI passou da v1 para a v2.
 - Empacotamento com `pyproject.toml` (hatchling) no lugar de `setup.py`.
 - Publicação no PyPI via Trusted Publishing.

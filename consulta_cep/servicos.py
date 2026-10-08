@@ -129,25 +129,6 @@ class ConsultaCEPAwesomeAPI(ConsultaCEP):
         )
 
 
-@registrar_servico
-class ConsultaCEPPostmon(ConsultaCEP):
-    nome = "postmon"
-    URL = "https://api.postmon.com.br/v1/cep/{cep}"
-
-    def converter(self, res: dict[str, Any], cep: str) -> Endereco:
-        cidade_info = res.get("cidade_info") or {}
-        return Endereco(
-            servico=self.nome,
-            estado=str(res["estado"]),
-            cidade=str(res["cidade"]),
-            bairro=texto_opcional(res.get("bairro")),
-            logradouro=texto_opcional(res.get("logradouro")),
-            cep=_cep(res, cep),
-            complemento=texto_opcional(res.get("complemento")),
-            ibge=texto_opcional(cidade_info.get("codigo_ibge")),
-        )
-
-
 SERVICOS_PADRAO: tuple[str, ...] = ("brasilapi", "viacep", "opencep", "awesomeapi")
 """Serviços consultados quando ``servicos`` não é informado."""
 

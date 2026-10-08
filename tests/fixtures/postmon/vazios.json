@@ -1,8 +1,0 @@
-{
-  "status": 200,
-  "body": {
-    "cidade": "São Paulo",
-    "estado": "SP",
-    "cep": "01001000"
-  }
-}

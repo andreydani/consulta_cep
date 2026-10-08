@@ -12,7 +12,7 @@ brasileiras ao mesmo tempo e devolvendo a primeira que responder.**
 ## Por que usar
 
 - **Várias APIs gratuitas, sem chave:** BrasilAPI, ViaCEP, OpenCEP e
-  AwesomeAPI (e Postmon, opcional).
+  AwesomeAPI.
 - **Fallback automático:** se uma API cair, demorar ou não conhecer o CEP, a
   resposta vem de outra. Por padrão todas são consultadas ao mesmo tempo e
   vale a primeira que responder.
@@ -80,18 +80,19 @@ Campos que o serviço não informa (ou informa vazios) ficam `None`.
 
 ## Serviços
 
-| Nome | API | Campos além de estado, cidade, bairro, logradouro e CEP | Na lista padrão |
-| --- | --- | --- | --- |
-| `brasilapi` | [BrasilAPI](https://brasilapi.com.br/docs#tag/CEP-V2) (`brasilapi.com.br/api/cep/v2/{cep}`) | `latitude`, `longitude` (quando disponíveis) | sim |
-| `viacep` | [ViaCEP](https://viacep.com.br) (`viacep.com.br/ws/{cep}/json/`) | `complemento`, `ibge`, `ddd` | sim |
-| `opencep` | [OpenCEP](https://opencep.com) (`opencep.com/v1/{cep}`) | `complemento`, `ibge` | sim |
-| `awesomeapi` | [AwesomeAPI](https://docs.awesomeapi.com.br/api-cep) (`cep.awesomeapi.com.br/json/{cep}`) | `ibge`, `ddd`, `latitude`, `longitude` | sim |
-| `postmon` | [Postmon](https://postmon.com.br) (`api.postmon.com.br/v1/cep/{cep}`) | `complemento`, `ibge` | não |
+Por padrão, os quatro são consultados.
+
+| Nome | API | Campos além de estado, cidade, bairro, logradouro e CEP |
+| --- | --- | --- |
+| `brasilapi` | [BrasilAPI](https://brasilapi.com.br/docs#tag/CEP-V2) (`brasilapi.com.br/api/cep/v2/{cep}`) | `latitude`, `longitude` (quando disponíveis) |
+| `viacep` | [ViaCEP](https://viacep.com.br) (`viacep.com.br/ws/{cep}/json/`) | `complemento`, `ibge`, `ddd` |
+| `opencep` | [OpenCEP](https://opencep.com) (`opencep.com/v1/{cep}`) | `complemento`, `ibge` |
+| `awesomeapi` | [AwesomeAPI](https://docs.awesomeapi.com.br/api-cep) (`cep.awesomeapi.com.br/json/{cep}`) | `ibge`, `ddd`, `latitude`, `longitude` |
 
 ```pycon
 >>> from consulta_cep import SERVICOS_PADRAO, servicos_disponiveis
 >>> servicos_disponiveis()
-['brasilapi', 'viacep', 'opencep', 'awesomeapi', 'postmon']
+['brasilapi', 'viacep', 'opencep', 'awesomeapi']
 >>> SERVICOS_PADRAO
 ('brasilapi', 'viacep', 'opencep', 'awesomeapi')
 ```
@@ -107,7 +108,7 @@ endereco = consulta_cep("01001-000", servicos=["viacep", "awesomeapi"])
 # Um por vez, na ordem, parando no primeiro sucesso: poupa requisições
 endereco = consulta_cep(
     "01001-000",
-    servicos=["viacep", "brasilapi", "postmon"],
+    servicos=["viacep", "brasilapi", "opencep"],
     estrategia="sequencial",
 )
 
@@ -330,8 +331,8 @@ A 1.0 tem mudanças incompatíveis. As principais:
 - **Sem `print()`.** As falhas de cada serviço vão para o logger
   `consulta_cep` (veja [Logs](#logs)).
 - **`Endereco`:**
-  - `servico` passa a ser o nome curto (`"brasilapi"`, `"postmon"`), não
-    mais `"BrasilAPI"`/`"PostMon"`;
+  - `servico` passa a ser o nome curto (`"brasilapi"`), não mais
+    `"BrasilAPI"`/`"PostMon"`;
   - `bairro` e `logradouro` podem ser `None`;
   - novos campos `cep`, `complemento`, `ibge`, `ddd`, `latitude` e
     `longitude` (no fim, com padrão `None`; a ordem dos campos antigos não
@@ -340,8 +341,9 @@ A 1.0 tem mudanças incompatíveis. As principais:
   - `estado` é validado: criar um `Endereco` com uma UF inexistente lança
     `ValueError`.
 - **Serviços:** a lista padrão agora é BrasilAPI (v2), ViaCEP, OpenCEP e
-  AwesomeAPI. O Postmon passou a usar HTTPS e saiu da lista padrão
-  (`servicos=["postmon"]` para usá-lo).
+  AwesomeAPI. O **Postmon foi removido**: a API dele foi desativada (o
+  domínio `api.postmon.com.br` não existe mais), e `servicos=["postmon"]`
+  lança `ValueError`.
 - **Serviços próprios:** subclasses de `ConsultaCEP` implementam
   `converter(dados, cep)` (e definem `nome` e `URL`) em vez de `consultar`.
 - **Linha de comando:** a saída padrão agora é texto (use `--formato json`
