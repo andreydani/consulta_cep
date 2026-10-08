@@ -1,47 +1,82 @@
-
+# Publica no PyPI ao publicar uma release no GitHub, usando Trusted Publishing
+# (OIDC): não há token guardado nos secrets do repositório.
 name: Publish to PyPI
 
 on:
   release:
     types: [published]
-  workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
-  build:
+  test:
+    name: Lint e testes
     runs-on: ubuntu-latest
-
+    strategy:
+      fail-fast: true
+      matrix:
+        python-version: ["3.10", "3.14"]
     steps:
-    - name: Check out repository
-      uses: actions/checkout@v2
+      - uses: actions/checkout@v6
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]"
+      - name: Ruff check
+        run: ruff check .
+      - name: Ruff format
+        run: ruff format --check .
+      - name: Mypy
+        run: mypy
+      - name: Pytest
+        run: pytest
 
-    - name: Set up Python
-      uses: actions/setup-python@v3
-      with:
-        python-version: '3.x'
+  build:
+    name: Build
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+      - name: Install build
+        run: python -m pip install --upgrade pip build
+      - name: Check that the tag matches the package version
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          VERSAO=$(python -c "import re, pathlib; print(re.search(r'__version__ = \"([^\"]+)\"', pathlib.Path('consulta_cep/__init__.py').read_text()).group(1))")
+          if [ "${TAG#v}" != "$VERSAO" ]; then
+            echo "::error::A tag ($TAG) não corresponde à versão do pacote ($VERSAO)."
+            exit 1
+          fi
+      - name: Build package
+        run: python -m build
+      - uses: actions/upload-artifact@v7
+        with:
+          name: dist
+          path: dist/
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements_dev.txt
-
-    - name: Run tests
-      run: |
-        pytest tests
-
-    - name: Build package
-      run: |
-        python setup.py sdist bdist_wheel
-
-    - name: Lint code
-      run: |
-        flake8 consulta_cep
-
-    - name: Publish package
-      uses: pypa/gh-action-pypi-publish@27b31702a0e7fc50959f5ad993c78deac1bdfc29
-      with:
-        user: __token__
-        password: ${{ secrets.PYPI_API_TOKEN }}
-
+  publish:
+    name: Publish
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/consulta-cep/
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v7
+        with:
+          name: dist
+          path: dist/
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1

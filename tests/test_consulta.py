@@ -368,4 +368,4 @@ def test_lista_padrao_vazia(consultar: Consulta) -> None:
 
 
 def test_versao() -> None:
-    assert pacote.__version__ == "1.0.0.dev0"
+    assert pacote.__version__ == "1.0.0"

@@ -19,6 +19,15 @@ o primeiro endereço obtido.
   biblioteca e nunca configurar handlers.
 - Toda requisição HTTP tem `timeout`.
 
+## Documentação e versão
+
+- `README.md` (para usuários), `CONTRIBUTING.md` (para contribuidores),
+  `CHANGELOG.md` (Keep a Changelog; toda mudança visível entra em
+  `[Não lançado]`).
+- Publicação: `.github/workflows/publish.yml` roda ao publicar uma release
+  `vX.Y.Z` (Trusted Publishing, environment `pypi`); a tag precisa bater com
+  `__version__`. Nunca publique, crie tags ou releases sem pedido explícito.
+
 ## Desenvolvimento
 
 ```bash
@@ -39,6 +48,10 @@ pytest -m live                   # testes contra as APIs reais
   roda o mesmo teste nas duas versões. Testes async usam `asyncio.run` (sem
   pytest-asyncio).
 - O cache padrão é limpo antes e depois de cada teste (`tests/conftest.py`).
+- Os exemplos do `README.md` são executados por `tests/test_readme.py`
+  (blocos `python`, `pycon`, `console` e `bash`). Tudo que o README mostrar
+  precisa existir e funcionar; para um bloco ilustrativo que não deve rodar,
+  coloque `<!-- readme: não testar -->` na linha anterior.
 - Testes que chamam as APIs reais recebem `@pytest.mark.live` (ou
   `pytestmark = pytest.mark.live`). Eles ficam desligados por padrão e rodam
   semanalmente no workflow `.github/workflows/live.yml`.
@@ -71,4 +84,5 @@ pytest -m live                   # testes contra as APIs reais
      e o caso em `NAO_ENCONTRADO` (`tests/test_servicos.py`);
    - os testes `live` em `tests/test_live.py` já cobrem todo serviço
      registrado.
-6. Documente o serviço no `readme.md`.
+6. Documente o serviço na tabela de serviços do `README.md` e registre a
+   novidade em `CHANGELOG.md` (seção `[Não lançado]`).

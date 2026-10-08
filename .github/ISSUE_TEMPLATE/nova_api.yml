@@ -1,0 +1,64 @@
+name: Nova API de CEP
+description: Sugira uma API de CEP para ser adicionada à biblioteca.
+labels: ["nova api"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Procuramos APIs públicas, gratuitas e sem chave de acesso. Veja em
+        CONTRIBUTING.md como adicionar um serviço, caso queira abrir o PR.
+  - type: input
+    id: nome
+    attributes:
+      label: Nome da API
+      placeholder: "Exemplo CEP"
+    validations:
+      required: true
+  - type: input
+    id: documentacao
+    attributes:
+      label: Link da documentação
+      placeholder: "https://..."
+    validations:
+      required: true
+  - type: input
+    id: url
+    attributes:
+      label: URL de consulta
+      placeholder: "https://api.exemplo.com.br/cep/{cep}"
+    validations:
+      required: true
+  - type: textarea
+    id: sucesso
+    attributes:
+      label: "Resposta para um CEP existente (ex.: 01001-000)"
+      description: Status HTTP e corpo da resposta.
+      render: json
+    validations:
+      required: true
+  - type: textarea
+    id: inexistente
+    attributes:
+      label: "Resposta para um CEP inexistente (ex.: 99999-999)"
+      description: Status HTTP e corpo da resposta.
+      render: json
+    validations:
+      required: true
+  - type: textarea
+    id: extras
+    attributes:
+      label: Campos extras
+      description: "Que informações ela traz além de estado, cidade, bairro e logradouro (IBGE, DDD, coordenadas...)?"
+  - type: checkboxes
+    id: requisitos
+    attributes:
+      label: Requisitos
+      options:
+        - label: A API é gratuita e não exige chave de acesso.
+          required: true
+        - label: Os termos de uso permitem consultas automatizadas.
+  - type: textarea
+    id: limites
+    attributes:
+      label: Limites de uso conhecidos
+      description: Limite de requisições, bloqueios etc.

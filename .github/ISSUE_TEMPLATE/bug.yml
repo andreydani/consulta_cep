@@ -1,0 +1,56 @@
+name: Relatar um bug
+description: Algo não funciona como esperado.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Obrigado por relatar! Se o problema for uma API de CEP que mudou ou
+        saiu do ar, informe qual serviço e, se possível, a resposta recebida.
+  - type: textarea
+    id: descricao
+    attributes:
+      label: O que aconteceu?
+      description: Descreva o problema e o que você esperava.
+    validations:
+      required: true
+  - type: textarea
+    id: reproducao
+    attributes:
+      label: Como reproduzir
+      description: Código mínimo ou comando (`consulta-cep ...`) e o CEP usado.
+      render: python
+    validations:
+      required: true
+  - type: textarea
+    id: saida
+    attributes:
+      label: Saída ou erro
+      description: Traceback, mensagem de erro ou saída obtida.
+      render: text
+  - type: input
+    id: versao
+    attributes:
+      label: Versão do consulta-cep
+      placeholder: "1.0.0 (python -m consulta_cep --version)"
+    validations:
+      required: true
+  - type: input
+    id: python
+    attributes:
+      label: Versão do Python e sistema operacional
+      placeholder: "Python 3.12, Ubuntu 24.04"
+    validations:
+      required: true
+  - type: dropdown
+    id: servico
+    attributes:
+      label: Serviço envolvido (se souber)
+      multiple: true
+      options:
+        - brasilapi
+        - viacep
+        - opencep
+        - awesomeapi
+        - postmon
+        - não sei

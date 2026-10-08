@@ -14,7 +14,7 @@ from .excecoes import (
 from .servicos import SERVICOS_CEP, SERVICOS_PADRAO, servicos_disponiveis
 from .util import TIMEOUT_PADRAO, normalizar_cep
 
-__version__ = "1.0.0.dev0"
+__version__ = "1.0.0"
 
 __all__ = [
     "SERVICOS_CEP",
