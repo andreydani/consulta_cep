@@ -1,0 +1,12 @@
+{
+  "status": 200,
+  "body": {
+    "cep": "01001000",
+    "state": "SP",
+    "city": "São Paulo",
+    "neighborhood": "",
+    "street": null,
+    "service": "correios",
+    "location": {"type": "Point", "coordinates": {}}
+  }
+}

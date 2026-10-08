@@ -15,11 +15,12 @@ from consulta_cep import (
 from consulta_cep.__main__ import main
 
 ENDERECO = Endereco(
-    servico="BrasilAPI",
+    servico="brasilapi",
     estado="SP",
     cidade="São Paulo",
     bairro="Sé",
     logradouro="Praça da Sé",
+    cep="01001000",
 )
 
 

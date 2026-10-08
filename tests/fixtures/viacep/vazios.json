@@ -1,0 +1,18 @@
+{
+  "status": 200,
+  "body": {
+    "cep": "01001-000",
+    "logradouro": "",
+    "complemento": "",
+    "unidade": "",
+    "bairro": "",
+    "localidade": "São Paulo",
+    "uf": "SP",
+    "estado": "São Paulo",
+    "regiao": "Sudeste",
+    "ibge": "3550308",
+    "gia": "",
+    "ddd": "",
+    "siafi": "7107"
+  }
+}

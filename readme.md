@@ -16,16 +16,54 @@ pip install consulta-cep
 ```python
 from consulta_cep import consulta_cep
 
-endereco = consulta_cep("05010-000")  # também aceita "05010000" e "05.010-000"
+endereco = consulta_cep("01001-000")  # também aceita "01001000" e "01.001-000"
 print(endereco)
-# {"servico": "BrasilAPI", "estado": "SP", "cidade": "São Paulo", "bairro": "Perdizes", "logradouro": "Rua Caiubi"}
+# {"servico": "viacep", "estado": "SP", "cidade": "São Paulo", "bairro": "Sé",
+#  "logradouro": "Praça da Sé", "cep": "01001-000", "complemento": "lado ímpar",
+#  "ibge": "3550308", "ddd": "11", "latitude": null, "longitude": null}
+
+endereco.to_dict()  # dicionário
+endereco.to_json()  # JSON (com acentos)
 
 # Tempo máximo de cada requisição, em segundos (padrão: 5)
-endereco = consulta_cep("05010-000", timeout=2)
+consulta_cep("01001-000", timeout=2)
+
+# Escolher os serviços (nomes ou instâncias), na ordem de preferência
+consulta_cep("01001-000", servicos=["viacep", "awesomeapi"])
+
+# Tentar um por vez, parando no primeiro sucesso (poupa requisições)
+consulta_cep("01001-000", servicos=["viacep", "brasilapi"], estrategia="sequencial")
 ```
 
-A consulta é feita em todos os serviços ao mesmo tempo e devolve o resultado do
-primeiro que responder com sucesso. Em caso de erro, `consulta_cep()` lança uma
+### Endereço
+
+| Campo | Observação |
+| --- | --- |
+| `servico` | Nome do serviço que respondeu. |
+| `estado` | Sempre a sigla da UF (`"SP"`). |
+| `cidade`, `bairro`, `logradouro`, `complemento` | |
+| `cep` | Formato `12345-678`. |
+| `ibge` | Código IBGE do município. |
+| `ddd` | |
+| `latitude`, `longitude` | `float`. |
+
+Campos que o serviço não informa (ou informa vazios) ficam `None`.
+
+### Serviços
+
+| Nome | API | Na lista padrão |
+| --- | --- | --- |
+| `brasilapi` | [BrasilAPI](https://brasilapi.com.br) (v2) | sim |
+| `viacep` | [ViaCEP](https://viacep.com.br) | sim |
+| `opencep` | [OpenCEP](https://opencep.com) | sim |
+| `awesomeapi` | [AwesomeAPI](https://docs.awesomeapi.com.br/api-cep) | sim |
+| `postmon` | [Postmon](https://postmon.com.br) | não |
+
+`servicos_disponiveis()` devolve a lista de nomes.
+
+Por padrão (`estrategia="concorrente"`), a consulta é feita em todos os
+serviços ao mesmo tempo e devolve o resultado do primeiro que responder com
+sucesso. Em caso de erro, `consulta_cep()` lança uma
 exceção (todas herdam de `ConsultaCEPError`):
 
 | Exceção | Quando |
@@ -56,7 +94,7 @@ Você pode executar como utilitário:
 consulta-cep 01001-000
 # ou: python -m consulta_cep 01001-000
 
-{"servico": "BrasilAPI", "estado": "SP", "cidade": "São Paulo", "bairro": "Sé", "logradouro": "Praça da Sé"}
+{"servico": "brasilapi", "estado": "SP", "cidade": "São Paulo", "bairro": "Sé", "logradouro": "Praça da Sé", "cep": "01001-000", "complemento": null, "ibge": null, "ddd": null, "latitude": -23.5502, "longitude": -46.6339}
 ```
 
 Em caso de erro, uma mensagem `{"erro": ...}` é escrita na saída de erro e o

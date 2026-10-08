@@ -1,0 +1,15 @@
+{
+  "status": 200,
+  "body": {
+    "cep": "01001000",
+    "state": "SP",
+    "city": "São Paulo",
+    "neighborhood": "Sé",
+    "street": "Praça da Sé",
+    "service": "open-cep",
+    "location": {
+      "type": "Point",
+      "coordinates": {"longitude": "-46.6339", "latitude": "-23.5502"}
+    }
+  }
+}

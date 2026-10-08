@@ -1,0 +1,16 @@
+{
+  "status": 200,
+  "body": {
+    "cep": "01001000",
+    "address_type": "Praça",
+    "address_name": "da Sé",
+    "address": "Praça da Sé",
+    "state": "SP",
+    "district": "Sé",
+    "lat": "-23.5502",
+    "lng": "-46.6339",
+    "city": "São Paulo",
+    "city_ibge": "3550308",
+    "ddd": "11"
+  }
+}

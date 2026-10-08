@@ -1,0 +1,13 @@
+{
+  "status": 200,
+  "body": {
+    "bairro": "Sé",
+    "cidade": "São Paulo",
+    "logradouro": "Praça da Sé",
+    "estado_info": {"area_km2": "248.221,996", "codigo_ibge": "35", "nome": "São Paulo"},
+    "cep": "01001000",
+    "cidade_info": {"area_km2": "1521,11", "codigo_ibge": "3550308"},
+    "estado": "SP",
+    "complemento": "lado ímpar"
+  }
+}
