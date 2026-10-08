@@ -1,0 +1,9 @@
+{
+  "status": 404,
+  "body": {
+    "name": "CepPromiseError",
+    "message": "Todos os serviços de CEP retornaram erro.",
+    "type": "service_error",
+    "errors": []
+  }
+}

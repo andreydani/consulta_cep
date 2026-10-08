@@ -1,0 +1,15 @@
+{
+  "status": 200,
+  "body": {
+    "cep": "01001-000",
+    "logradouro": "",
+    "complemento": "",
+    "unidade": "",
+    "bairro": "",
+    "localidade": "São Paulo",
+    "uf": "",
+    "estado": "São Paulo",
+    "regiao": "Sudeste",
+    "ibge": ""
+  }
+}

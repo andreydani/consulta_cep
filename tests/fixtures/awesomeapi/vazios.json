@@ -1,0 +1,16 @@
+{
+  "status": 200,
+  "body": {
+    "cep": "01001000",
+    "address_type": "",
+    "address_name": "",
+    "address": "",
+    "state": "SP",
+    "district": "",
+    "lat": "",
+    "lng": null,
+    "city": "São Paulo",
+    "city_ibge": "3550308",
+    "ddd": ""
+  }
+}

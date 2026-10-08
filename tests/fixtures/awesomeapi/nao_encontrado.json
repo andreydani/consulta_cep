@@ -1,0 +1,7 @@
+{
+  "status": 404,
+  "body": {
+    "code": "not_found",
+    "message": "O CEP 99999999 nao foi encontrado"
+  }
+}
