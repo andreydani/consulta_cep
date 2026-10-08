@@ -76,11 +76,11 @@ def test_varios_ceps_em_texto_separados(api: respx.MockRouter, capsys: Saida) ->
 
 def test_servico_repetivel_e_estrategia(api: respx.MockRouter) -> None:
     viacep = simular(api, "viacep", "nao_encontrado")
-    postmon = simular(api, "postmon", "sucesso")
     opencep = simular(api, "opencep", "sucesso")
-    argv = [CEP, "-s", "viacep", "-s", "postmon", "-s", "opencep"]
+    awesomeapi = simular(api, "awesomeapi", "sucesso")
+    argv = [CEP, "-s", "viacep", "-s", "opencep", "-s", "awesomeapi"]
     assert main([*argv, "--estrategia", "sequencial"]) == 0
-    assert (viacep.call_count, postmon.call_count, opencep.call_count) == (1, 1, 0)
+    assert (viacep.call_count, opencep.call_count, awesomeapi.call_count) == (1, 1, 0)
 
 
 def test_padrao_usa_lista_padrao(api: respx.MockRouter) -> None:

@@ -58,17 +58,6 @@ def test_sucesso_de_cada_servico_padrao(
     assert endereco.cep == "01001-000"
 
 
-def test_lista_padrao_nao_consulta_postmon(
-    consultar: Consulta, api: respx.MockRouter
-) -> None:
-    for nome in SERVICOS_PADRAO:
-        api.get(url(nome)).respond(500)
-    with pytest.raises(ServicosIndisponiveisError) as info:
-        consultar(CEP)
-    assert set(info.value.erros) == set(SERVICOS_PADRAO)
-    assert all("postmon" not in str(c.request.url) for c in api.calls)
-
-
 def test_nao_encontrado_em_todos(consultar: Consulta, api: respx.MockRouter) -> None:
     for nome in SERVICOS_PADRAO:
         simular(api, nome, "nao_encontrado")
@@ -111,9 +100,9 @@ def test_cep_invalido_nao_dispara_consultas(consultar: Consulta) -> None:
 
 
 def test_servicos_por_nome(consultar: Consulta, api: respx.MockRouter) -> None:
-    simular(api, "postmon", "sucesso")
-    assert consultar(CEP, servicos=["postmon"]).servico == "postmon"
-    assert consultar(CEP, servicos="postmon").servico == "postmon"
+    simular(api, "opencep", "sucesso")
+    assert consultar(CEP, servicos=["opencep"]).servico == "opencep"
+    assert consultar(CEP, servicos="opencep").servico == "opencep"
 
 
 def test_servicos_mistura_nomes_e_instancias(

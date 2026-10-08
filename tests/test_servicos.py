@@ -17,7 +17,6 @@ from consulta_cep import (
 from consulta_cep.engine_cep import ConsultaCEP
 from consulta_cep.servicos import (
     ConsultaCEPBrasilAPI,
-    ConsultaCEPPostmon,
     ConsultaCEPViaCEP,
     obter_servico,
     registrar_servico,
@@ -50,7 +49,6 @@ ESPERADO_SUCESSO: dict[str, dict[str, Any]] = {
         "latitude": -23.5502,
         "longitude": -46.6339,
     },
-    "postmon": {**BASE, "complemento": "lado ímpar", "ibge": "3550308"},
 }
 
 VAZIOS = {"bairro": None, "logradouro": None, "complemento": None, "ddd": None}
@@ -59,7 +57,6 @@ ESPERADO_VAZIOS: dict[str, dict[str, Any]] = {
     "viacep": {**BASE, **VAZIOS, "ibge": "3550308"},
     "opencep": {**BASE, **VAZIOS},
     "awesomeapi": {**BASE, **VAZIOS, "ibge": "3550308"},
-    "postmon": {**BASE, **VAZIOS},
 }
 
 NAO_ENCONTRADO = [
@@ -68,7 +65,6 @@ NAO_ENCONTRADO = [
     ("viacep", "nao_encontrado_bool"),
     ("opencep", "nao_encontrado"),
     ("awesomeapi", "nao_encontrado"),
-    ("postmon", "nao_encontrado"),
 ]
 
 
@@ -78,14 +74,15 @@ def test_registro() -> None:
         "viacep",
         "opencep",
         "awesomeapi",
-        "postmon",
     ]
     assert SERVICOS_PADRAO == ("brasilapi", "viacep", "opencep", "awesomeapi")
-    assert "postmon" not in SERVICOS_PADRAO
+    assert tuple(servicos_disponiveis()) == SERVICOS_PADRAO
 
 
-def test_postmon_usa_https() -> None:
-    assert ConsultaCEPPostmon.URL.startswith("https://")
+def test_postmon_foi_removido() -> None:
+    # A API do Postmon foi desativada (o domínio não resolve mais).
+    with pytest.raises(ValueError, match="postmon"):
+        obter_servico("postmon")
 
 
 def test_montar_url() -> None:

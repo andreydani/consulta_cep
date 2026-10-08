@@ -54,7 +54,10 @@ pytest -m live                   # testes contra as APIs reais
   coloque `<!-- readme: não testar -->` na linha anterior.
 - Testes que chamam as APIs reais recebem `@pytest.mark.live` (ou
   `pytestmark = pytest.mark.live`). Eles ficam desligados por padrão e rodam
-  semanalmente no workflow `.github/workflows/live.yml`.
+  semanalmente no workflow `.github/workflows/live.yml`. Em `tests/test_live.py`,
+  respostas HTTP 429 (limite de requisições, comum nos runners do GitHub)
+  pulam o teste em vez de falhar; o CEP inexistente de referência é
+  `00000-000`.
 
 ## Como adicionar um serviço novo
 
