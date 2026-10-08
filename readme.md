@@ -86,20 +86,90 @@ except ConsultaCEPError:
 Os erros de cada serviço são registrados no logger `consulta_cep`, do módulo
 `logging`.
 
-## Uso utilitário
+### Assíncrono (asyncio)
 
-Você pode executar como utilitário:
+`consulta_cep_async()` tem os mesmos parâmetros e exceções. Na estratégia
+concorrente, devolve o primeiro sucesso e cancela as consultas restantes.
+
+```python
+import asyncio
+
+from consulta_cep import consulta_cep_async
+
+endereco = asyncio.run(consulta_cep_async("01001-000"))
+```
+
+### Reaproveitando conexões (`client`)
+
+Passe um `httpx.Client` (ou `httpx.AsyncClient` na versão assíncrona) para
+reaproveitar conexões ou configurar proxy, certificados etc. O cliente não é
+fechado pela biblioteca.
+
+```python
+import httpx
+
+from consulta_cep import consulta_cep
+
+with httpx.Client(proxy="http://proxy.local:8080") as client:
+    for cep in ["01001-000", "20040-020"]:
+        print(consulta_cep(cep, client=client))
+```
+
+### Cache
+
+Desligado por padrão. Com `cache=True`, os endereços encontrados ficam num
+cache em memória (LRU, até 1024 CEPs, válidos por 24 horas), compartilhado
+entre `consulta_cep()` e `consulta_cep_async()` e seguro entre threads. Falhas
+e CEPs não encontrados nunca são guardados. O cache é indexado só pelo CEP: um
+acerto devolve o endereço guardado, seja qual for o serviço que o obteve.
+
+```python
+from consulta_cep import CacheLRU, consulta_cep, limpar_cache
+
+consulta_cep("01001-000", cache=True)  # consulta os serviços
+consulta_cep("01001-000", cache=True)  # vem do cache
+limpar_cache()
+
+# Cache próprio, com outro tamanho e validade (em segundos)
+meu_cache = CacheLRU(maximo=100, ttl=3600)
+consulta_cep("01001-000", cache=meu_cache)
+```
+
+## Linha de comando
 
 ```bash
 consulta-cep 01001-000
 # ou: python -m consulta_cep 01001-000
 
-{"servico": "brasilapi", "estado": "SP", "cidade": "São Paulo", "bairro": "Sé", "logradouro": "Praça da Sé", "cep": "01001-000", "complemento": null, "ibge": null, "ddd": null, "latitude": -23.5502, "longitude": -46.6339}
+CEP: 01001-000
+Logradouro: Praça da Sé
+Complemento: lado ímpar
+Bairro: Sé
+Cidade: São Paulo
+Estado: SP
+IBGE: 3550308
+DDD: 11
+Serviço: viacep
 ```
 
-Em caso de erro, uma mensagem `{"erro": ...}` é escrita na saída de erro e o
-código de saída é 2 (CEP inválido) ou 1 (CEP não encontrado ou serviços
-indisponíveis).
+```bash
+consulta-cep 01001-000 20040-020 --formato json   # um objeto JSON por linha
+consulta-cep 01001-000 -s viacep -s brasilapi --estrategia sequencial
+consulta-cep 01001-000 --timeout 2
+consulta-cep --version
+```
+
+| Opção | |
+| --- | --- |
+| `-s`, `--servico` | Serviço a consultar; repita para usar mais de um, na ordem de preferência. |
+| `-e`, `--estrategia` | `concorrente` (padrão) ou `sequencial`. |
+| `-t`, `--timeout` | Tempo máximo de cada requisição, em segundos (padrão: 5). |
+| `-f`, `--formato` | `texto` (padrão) ou `json`. |
+| `--version` | Mostra a versão. |
+
+Erros vão para a saída de erro (em JSON com `--formato json`). Códigos de
+saída: `0` sucesso, `1` CEP não encontrado, `2` CEP inválido, `3` serviços
+indisponíveis. Com vários CEPs, vale o maior código.
 
 ## Desenvolvimento
 

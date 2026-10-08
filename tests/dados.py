@@ -4,9 +4,10 @@ import json
 from pathlib import Path
 from typing import Any
 
-import responses
+import httpx
+import respx
 
-from consulta_cep.servicos import _REGISTRO
+from consulta_cep.servicos import obter_servico
 
 CEP = "01001000"
 CEP_INEXISTENTE = "99999999"
@@ -22,19 +23,22 @@ def fixture(servico: str, nome: str) -> dict[str, Any]:
 
 
 def url(servico: str, cep: str = CEP) -> str:
-    return str(vars(_REGISTRO[servico])["URL"]).format(cep=cep)
+    return obter_servico(servico).montar_url(cep)
+
+
+def resposta(servico: str, nome: str) -> httpx.Response:
+    """Monta a resposta HTTP da fixture ``nome`` do serviço."""
+    dados = fixture(servico, nome)
+    if dados["body"] is None:
+        return httpx.Response(dados["status"])
+    return httpx.Response(dados["status"], json=dados["body"])
 
 
 def simular(
-    mock: responses.RequestsMock,
+    router: respx.MockRouter,
     servico: str,
     nome: str,
     cep: str = CEP,
-) -> None:
-    """Registra no ``mock`` a fixture ``nome`` do serviço."""
-    dados = fixture(servico, nome)
-    body = dados["body"]
-    if body is None:
-        mock.get(url(servico, cep), status=dados["status"])
-    else:
-        mock.get(url(servico, cep), status=dados["status"], json=body)
+) -> respx.Route:
+    """Registra no ``router`` a fixture ``nome`` do serviço."""
+    return router.get(url(servico, cep)).mock(return_value=resposta(servico, nome))

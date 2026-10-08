@@ -4,7 +4,6 @@ from typing import Any, TypeVar
 
 from .engine_cep import ConsultaCEP, Endereco, numero_opcional, texto_opcional
 from .excecoes import CEPNaoEncontradoError
-from .util import TIMEOUT_PADRAO, consulta_cep_https
 
 _REGISTRO: dict[str, type[ConsultaCEP]] = {}
 
@@ -55,10 +54,7 @@ class ConsultaCEPBrasilAPI(ConsultaCEP):
     nome = "brasilapi"
     URL = "https://brasilapi.com.br/api/cep/v2/{cep}"
 
-    def consultar_normalizado(
-        self, cep: str, *, timeout: float = TIMEOUT_PADRAO
-    ) -> Endereco:
-        res = consulta_cep_https(self.URL, cep, timeout=timeout)
+    def converter(self, res: dict[str, Any], cep: str) -> Endereco:
         location = res.get("location") or {}
         coordenadas = location.get("coordinates") or {}
         return Endereco(
@@ -78,10 +74,7 @@ class ConsultaCEPViaCEP(ConsultaCEP):
     nome = "viacep"
     URL = "https://viacep.com.br/ws/{cep}/json/"
 
-    def consultar_normalizado(
-        self, cep: str, *, timeout: float = TIMEOUT_PADRAO
-    ) -> Endereco:
-        res = consulta_cep_https(self.URL, cep, timeout=timeout)
+    def converter(self, res: dict[str, Any], cep: str) -> Endereco:
         # CEP inexistente: status 200 com {"erro": "true"} ou {"erro": true}.
         if str(res.get("erro", "")).lower() == "true":
             raise CEPNaoEncontradoError(cep)
@@ -103,10 +96,7 @@ class ConsultaCEPOpenCEP(ConsultaCEP):
     nome = "opencep"
     URL = "https://opencep.com/v1/{cep}"
 
-    def consultar_normalizado(
-        self, cep: str, *, timeout: float = TIMEOUT_PADRAO
-    ) -> Endereco:
-        res = consulta_cep_https(self.URL, cep, timeout=timeout)
+    def converter(self, res: dict[str, Any], cep: str) -> Endereco:
         return Endereco(
             servico=self.nome,
             estado=str(_primeiro(res.get("uf"), res.get("estado"))),
@@ -124,10 +114,7 @@ class ConsultaCEPAwesomeAPI(ConsultaCEP):
     nome = "awesomeapi"
     URL = "https://cep.awesomeapi.com.br/json/{cep}"
 
-    def consultar_normalizado(
-        self, cep: str, *, timeout: float = TIMEOUT_PADRAO
-    ) -> Endereco:
-        res = consulta_cep_https(self.URL, cep, timeout=timeout)
+    def converter(self, res: dict[str, Any], cep: str) -> Endereco:
         return Endereco(
             servico=self.nome,
             estado=str(res["state"]),
@@ -147,10 +134,7 @@ class ConsultaCEPPostmon(ConsultaCEP):
     nome = "postmon"
     URL = "https://api.postmon.com.br/v1/cep/{cep}"
 
-    def consultar_normalizado(
-        self, cep: str, *, timeout: float = TIMEOUT_PADRAO
-    ) -> Endereco:
-        res = consulta_cep_https(self.URL, cep, timeout=timeout)
+    def converter(self, res: dict[str, Any], cep: str) -> Endereco:
         cidade_info = res.get("cidade_info") or {}
         return Endereco(
             servico=self.nome,

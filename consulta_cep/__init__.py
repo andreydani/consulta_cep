@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from .consulta import Estrategia, consulta_cep
+from .cache import CacheLRU, limpar_cache
+from .consulta import Estrategia, consulta_cep, consulta_cep_async
 from .engine_cep import ConsultaCEP, Endereco
 from .excecoes import (
     CEPInvalidoError,
@@ -21,6 +22,7 @@ __all__ = [
     "TIMEOUT_PADRAO",
     "CEPInvalidoError",
     "CEPNaoEncontradoError",
+    "CacheLRU",
     "ConsultaCEP",
     "ConsultaCEPError",
     "Endereco",
@@ -28,6 +30,8 @@ __all__ = [
     "ServicosIndisponiveisError",
     "__version__",
     "consulta_cep",
+    "consulta_cep_async",
+    "limpar_cache",
     "normalizar_cep",
     "servicos_disponiveis",
 ]

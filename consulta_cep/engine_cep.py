@@ -6,7 +6,9 @@ import unicodedata
 from abc import ABC, abstractmethod
 from typing import Any
 
-from .util import TIMEOUT_PADRAO, normalizar_cep
+import httpx
+
+from .util import TIMEOUT_PADRAO, ler_resposta, normalizar_cep
 
 UFS: dict[str, str] = {
     "AC": "Acre",
@@ -130,20 +132,84 @@ class ConsultaCEP(ABC):
     """Base dos serviços de consulta de CEP.
 
     Subclasses definem ``nome`` (nome curto, usado no registro e em
-    ``Endereco.servico``) e implementam :meth:`consultar_normalizado`.
+    ``Endereco.servico``), ``URL`` (com o marcador ``{cep}``) e implementam
+    :meth:`converter`. Os caminhos síncrono e assíncrono compartilham
+    :meth:`montar_url` e :meth:`converter`.
     """
 
     nome: str = ""
+    URL: str = ""
 
-    def consultar(self, cep: str, *, timeout: float = TIMEOUT_PADRAO) -> Endereco:
-        """Valida, normaliza e consulta o CEP neste serviço."""
-        return self.consultar_normalizado(normalizar_cep(cep), timeout=timeout)
+    def montar_url(self, cep: str) -> str:
+        """URL da consulta para um CEP já normalizado (8 dígitos)."""
+        return self.URL.format(cep=cep)
 
     @abstractmethod
+    def converter(self, dados: dict[str, Any], cep: str) -> Endereco:
+        """Converte o JSON da resposta em :class:`Endereco`.
+
+        Lança :class:`CEPNaoEncontradoError` se a resposta indicar que o CEP
+        não existe.
+        """
+
+    def interpretar(self, resposta: httpx.Response, cep: str) -> Endereco:
+        """Valida a resposta HTTP e converte o JSON."""
+        return self.converter(ler_resposta(resposta, cep), cep)
+
+    def consultar(
+        self,
+        cep: str,
+        *,
+        timeout: float = TIMEOUT_PADRAO,
+        client: httpx.Client | None = None,
+    ) -> Endereco:
+        """Valida, normaliza e consulta o CEP neste serviço."""
+        return self.consultar_normalizado(
+            normalizar_cep(cep), timeout=timeout, client=client
+        )
+
+    async def consultar_async(
+        self,
+        cep: str,
+        *,
+        timeout: float = TIMEOUT_PADRAO,
+        client: httpx.AsyncClient | None = None,
+    ) -> Endereco:
+        """Versão assíncrona de :meth:`consultar`."""
+        return await self.consultar_normalizado_async(
+            normalizar_cep(cep), timeout=timeout, client=client
+        )
+
     def consultar_normalizado(
-        self, cep: str, *, timeout: float = TIMEOUT_PADRAO
+        self,
+        cep: str,
+        *,
+        timeout: float = TIMEOUT_PADRAO,
+        client: httpx.Client | None = None,
     ) -> Endereco:
         """Consulta um CEP já normalizado (8 dígitos)."""
+        url = self.montar_url(cep)
+        if client is None:
+            resposta = httpx.get(url, timeout=timeout)
+        else:
+            resposta = client.get(url, timeout=timeout)
+        return self.interpretar(resposta, cep)
+
+    async def consultar_normalizado_async(
+        self,
+        cep: str,
+        *,
+        timeout: float = TIMEOUT_PADRAO,
+        client: httpx.AsyncClient | None = None,
+    ) -> Endereco:
+        """Versão assíncrona de :meth:`consultar_normalizado`."""
+        url = self.montar_url(cep)
+        if client is None:
+            async with httpx.AsyncClient() as novo:
+                resposta = await novo.get(url, timeout=timeout)
+        else:
+            resposta = await client.get(url, timeout=timeout)
+        return self.interpretar(resposta, cep)
 
     def __repr__(self) -> str:
         return f"{type(self).__name__}()"

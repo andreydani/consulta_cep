@@ -3,7 +3,7 @@ from __future__ import annotations
 import re
 from typing import Any
 
-import requests
+import httpx
 
 from .excecoes import CEPInvalidoError, CEPNaoEncontradoError
 
@@ -38,19 +38,36 @@ def sanitizar_cep(cep: str) -> str:
     return normalizar_cep(cep)
 
 
+def ler_resposta(resposta: httpx.Response, cep: str) -> dict[str, Any]:
+    """Valida a resposta HTTP e devolve o JSON como dicionário.
+
+    Lança :class:`CEPNaoEncontradoError` para respostas 404,
+    :class:`httpx.HTTPStatusError` para outros erros HTTP e :class:`ValueError`
+    se o corpo não for um objeto JSON.
+    """
+    if resposta.status_code == 404:
+        raise CEPNaoEncontradoError(cep)
+    resposta.raise_for_status()
+    dados = resposta.json()
+    if not isinstance(dados, dict):
+        raise ValueError(f"Resposta inesperada de {resposta.url}: {dados!r}")
+    return dados
+
+
 def consulta_cep_https(
-    url: str, cep: str, *, timeout: float = TIMEOUT_PADRAO
+    url: str,
+    cep: str,
+    *,
+    timeout: float = TIMEOUT_PADRAO,
+    client: httpx.Client | None = None,
 ) -> dict[str, Any]:
     """Faz o GET em ``url`` (com ``{cep}`` substituído) e devolve o JSON.
 
-    Lança :class:`CEPNaoEncontradoError` para respostas 404 e
-    :class:`requests.HTTPError` para outros erros HTTP.
+    Veja :func:`ler_resposta` para as exceções.
     """
-    response = requests.get(url.format(cep=cep), timeout=timeout)
-    if response.status_code == 404:
-        raise CEPNaoEncontradoError(cep)
-    response.raise_for_status()
-    dados = response.json()
-    if not isinstance(dados, dict):
-        raise ValueError(f"Resposta inesperada de {response.url}: {dados!r}")
-    return dados
+    endereco = url.format(cep=cep)
+    if client is None:
+        resposta = httpx.get(endereco, timeout=timeout)
+    else:
+        resposta = client.get(endereco, timeout=timeout)
+    return ler_resposta(resposta, cep)
